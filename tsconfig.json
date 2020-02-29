@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "outDir": "build/backend",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "src/backend/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts",
+        "src/frontend/**/*"
+    ]
+}

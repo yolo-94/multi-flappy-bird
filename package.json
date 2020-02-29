@@ -1,0 +1,39 @@
+{
+    "name": "multi-bird",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "encore:build": "encore dev",
+        "encore:watch": "encore dev --watch",
+        "encore:watch-webpack-config": "nodemon --watch ./webpack.config.js --delay 1000ms --exec 'npm run encore:watch'",
+        "server:build": "tsc",
+        "server:watch": "concurrently --kill-others npm:server:watch-*",
+        "server:watch-typescript": "tsc -w",
+        "server:watch-node": "nodemon build/app.js",
+        "dev": "concurrently npm:server:watch npm:encore:watch-webpack-config"
+    },
+    "author": "yolo-94",
+    "license": "ISC",
+    "devDependencies": {
+        "@symfony/webpack-encore": "^0.28.3",
+        "@types/express": "^4.17.2",
+        "@types/node": "^13.7.0",
+        "concurrently": "^5.1.0",
+        "node-sass": "^4.13.1",
+        "postcss-loader": "^3.0.0",
+        "pug": "^2.0.4",
+        "pug-plain-loader": "^1.0.0",
+        "sass-loader": "^7.1.0",
+        "ts-loader": "^5.4.5",
+        "typescript": "^3.7.5"
+    },
+    "dependencies": {
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "minireset.css": "0.0.6",
+        "nodemon": "^2.0.2",
+        "vue": "^2.6.11"
+    }
+}

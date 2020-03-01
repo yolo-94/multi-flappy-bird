@@ -170,6 +170,9 @@ export class Game extends GameDraw {
 
 export class Config {
     public serverTimeUp: number
+    public defaultBirdSpeed: number
+    public gravity: number
+    public velocityMax: number
 }
 
 let game = new Game("#game-zone")

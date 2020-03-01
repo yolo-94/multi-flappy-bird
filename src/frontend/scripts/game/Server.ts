@@ -70,7 +70,10 @@ export class Server {
 
     handleConfig(config) {
         this.game.config = {
-            serverTimeUp: config.serverTimeUp ?? 0
+            serverTimeUp: config.serverTimeUp ?? 0,
+            defaultBirdSpeed: config.defaultBirdSpeed ?? 1,
+            gravity: config.gravity ?? 1,
+            velocityMax: config.velocityMax ?? 10
         }
         console.log(config)
     }

@@ -48,7 +48,10 @@ io.on('connection', function (socket) {
     socket.on("get:config", () => {
 
         socket.emit("config", {
-            serverTimeUp
+            serverTimeUp,
+            defaultBirdSpeed: 2,
+            gravity: 0.5,
+            velocityMax: 10
         })
 
     })

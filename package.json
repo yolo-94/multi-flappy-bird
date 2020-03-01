@@ -27,13 +27,16 @@
         "pug-plain-loader": "^1.0.0",
         "sass-loader": "^7.1.0",
         "ts-loader": "^5.4.5",
-        "typescript": "^3.7.5"
+        "typescript": "^3.7.5",
+        "vue-loader": "^15.0.11",
+        "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "minireset.css": "0.0.6",
         "nodemon": "^2.0.2",
+        "socket.io": "^2.3.0",
         "vue": "^2.6.11"
     }
 }

@@ -11,6 +11,7 @@ import { Score } from "./Score"
 import { Scene, SceneIntro, SceneBase } from "./Scene"
 import { getPixelRatio } from "./utils"
 import { Menu } from "./Menu"
+import { Server } from "./Server"
 
 export class Game extends GameDraw {
     public canvas: HTMLCanvasElement
@@ -22,6 +23,7 @@ export class Game extends GameDraw {
     public fpsCounter: FpsCounter
     public input: Input
     public assets: Assets
+    public server: Server
 
     public menu: Menu
     public scene: Scene|SceneIntro
@@ -148,9 +150,10 @@ export class Game extends GameDraw {
         this.scene = new SceneIntro(this)
     }
 
-    startPlay() {
-        this.menu.close()
-        this.scene = new Scene(this)
+    async startPlay() {
+        this.menu.serverConnection()
+        // this.menu.close()
+        // this.scene = new Scene(this)
     }
 }
 

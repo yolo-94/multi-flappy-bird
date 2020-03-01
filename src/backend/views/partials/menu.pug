@@ -1,5 +1,11 @@
-div.main-menu
+div.main-menu(v-if="current == 'main'")
     h1.title
         = site.name
+    div.username-zone
+        input.username-input(type="text", placeholder="Surnom", v-model="username", maxlength="20")
     button.btn-play(@click="play")
         | Jouer
+
+div.server-connection(v-else-if="current == 'serverConnection'")
+    h1
+        | Connexion au serveur...

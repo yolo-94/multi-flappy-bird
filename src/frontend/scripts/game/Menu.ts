@@ -39,7 +39,9 @@ export class Menu {
             data: {
                 hidden: false,
                 darkBg: false,
-                current: "main"
+                current: "main",
+
+                username: ""
             },
             methods: {            
                 play: function () {
@@ -53,5 +55,11 @@ export class Menu {
         this.vue.hidden = false
         this.vue.darkBg = true
         this.vue.current = "main"
+    }
+
+    serverConnection() {
+        this.vue.hidden = false
+        this.vue.darkBg = true
+        this.vue.current = "serverConnection"
     }
 }

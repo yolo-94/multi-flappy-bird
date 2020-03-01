@@ -1,9 +1,16 @@
 require('dotenv').config()
 import express from "express"
-let app = express()
+import http from "http"
+import socketIo from "socket.io"
 import path from "path"
 import { htmlCss, htmlJs } from "./encore"
 
+let app = express()
+let server = require('http').Server(app)
+let io = socketIo(server)
+
+
+const serverTimeUp = Date.now()
 
 /* Dossier statique */
 app.use("/static", express.static('static'))
@@ -34,7 +41,22 @@ app.get("/static/html/menu.html", function (req: express.Request, res: express.R
 })
 
 
-const port = 8090
-app.listen(port, function () {
-    console.log('Open in port ' + port + '...')
+io.on('connection', function (socket) {
+
+    socket.emit("connected", true)
+
+    socket.on("get:config", () => {
+
+        socket.emit("config", {
+            serverTimeUp
+        })
+
+    })
+
 })
+
+
+
+const port = 8090
+server.listen(port)
+console.log('Open in port ' + port + ' !')

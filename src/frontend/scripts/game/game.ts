@@ -8,7 +8,7 @@ import { Background } from "./Background"
 import { PipesManager } from "./PipesManager"
 import { Input } from "./Input"
 import { Score } from "./Score"
-import { Scene, SceneIntro, SceneBase } from "./Scene"
+import { Scene, SceneIntro, SceneBase, SceneEmpty } from "./Scene"
 import { getPixelRatio } from "./utils"
 import { Menu } from "./Menu"
 import { Server } from "./Server"
@@ -24,6 +24,7 @@ export class Game extends GameDraw {
     public input: Input
     public assets: Assets
     public server: Server
+    public config: Config
 
     public menu: Menu
     public scene: Scene|SceneIntro
@@ -46,6 +47,8 @@ export class Game extends GameDraw {
         this.fpsCounter = new FpsCounter()
         this.camera = new Camera(0, 0)
         this.assets = new Assets()
+        this.server = new Server(this)
+        this.config = new Config()
         this.ctx = this.canvas.getContext("2d")
         this.ctx.imageSmoothingEnabled = false
 
@@ -83,7 +86,7 @@ export class Game extends GameDraw {
 
         this.input = new Input()
 
-        this.startIntro()
+        this.startMainMenu()
         this.requestAnimationFrame(null)
     }
 
@@ -145,16 +148,28 @@ export class Game extends GameDraw {
         window.addEventListener("resize", () => this.changeSize(window.innerWidth, window.innerHeight))
     }
 
-    startIntro() {
+    startMainMenu() {
         this.menu.home()
         this.scene = new SceneIntro(this)
     }
 
     async startPlay() {
         this.menu.serverConnection()
-        // this.menu.close()
+        await this.server.connect()
+        this.menu.close()
         // this.scene = new Scene(this)
     }
+
+    async reconnect() {
+        this.scene = new SceneEmpty(game)
+        this.menu.serverReconnection()
+        await this.server.waitConnection()
+        this.menu.close()
+    }
+}
+
+export class Config {
+    public serverTimeUp: number
 }
 
 let game = new Game("#game-zone")

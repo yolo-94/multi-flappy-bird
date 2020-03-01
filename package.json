@@ -20,6 +20,7 @@
         "@symfony/webpack-encore": "^0.28.3",
         "@types/express": "^4.17.2",
         "@types/node": "^13.7.0",
+        "@types/socket.io-client": "^1.4.32",
         "concurrently": "^5.1.0",
         "node-sass": "^4.13.1",
         "postcss-loader": "^3.0.0",
@@ -32,11 +33,13 @@
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
+        "@types/socket.io": "^2.1.4",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "minireset.css": "0.0.6",
         "nodemon": "^2.0.2",
         "socket.io": "^2.3.0",
+        "socket.io-client": "^2.3.0",
         "vue": "^2.6.11"
     }
 }

@@ -62,4 +62,10 @@ export class Menu {
         this.vue.darkBg = true
         this.vue.current = "serverConnection"
     }
+
+    serverReconnection() {
+        this.vue.hidden = false
+        this.vue.darkBg = true
+        this.vue.current = "serverReconnection"
+    }
 }

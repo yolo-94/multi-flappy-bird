@@ -9,3 +9,8 @@ div.main-menu(v-if="current == 'main'")
 div.server-connection(v-else-if="current == 'serverConnection'")
     h1
         | Connexion au serveur...
+
+div.server-reconnection(v-else-if="current == 'serverReconnection'")
+    h1
+        | Reconnexion au serveur...
+    img(src="/static/images/mj.gif")

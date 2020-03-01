@@ -114,7 +114,8 @@ body {
         }
 
         // Server connection
-        .server-connection {            
+        .server-connection,
+        .server-reconnection {            
             font-family: "Arcade Classic", Arial, Helvetica, sans-serif;
             font-size: 3rem;
             letter-spacing: 0.5rem;
@@ -125,6 +126,18 @@ body {
             h1 {
                 text-align: center;
                 margin: auto;
+            }
+        }
+ 
+        .server-reconnection {
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+
+            h1 {
+                margin: 0;
+                width: 100%;
+                text-align: center;
             }
         }
 

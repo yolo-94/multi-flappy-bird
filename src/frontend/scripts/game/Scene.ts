@@ -45,3 +45,10 @@ export class SceneIntro extends SceneBase {
         }
     }
 }
+
+export class SceneEmpty extends SceneIntro {
+    constructor (game: Game) {
+        super(game)
+        this.birds = []
+    }
+}

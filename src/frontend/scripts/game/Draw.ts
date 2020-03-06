@@ -16,14 +16,22 @@ export class GameDraw {
     assets: Assets
     fpsCounter: FpsCounter
 
-    drawText(text: string, x: number, y: number, size: number = 5, color: string = "#000000", align: CanvasTextAlign = "left") {
-        this.ctx.font = size+"px Consolas"
+    drawText(text: string, x: number, y: number, style: number|string = 5, color: string = "#000000", align: CanvasTextAlign = "left", fixe: boolean = true) {
+        let dx = !fixe ? x - this.camera.x : x
+        let dy = !fixe ? y - this.camera.y : y
+        
+        if(typeof style == "number") {
+            this.ctx.font = (style as number)+"px 'Roboto Mono'"
+        } else {
+            this.ctx.font = style
+        }
+
         this.ctx.fillStyle = color
         this.ctx.textAlign = align
-        this.ctx.fillText(text,x,y)
+        this.ctx.fillText(text, dx, dy)
     }
 
-    getImg(imgArg) {
+    getImg(imgArg): HTMLImageElement {
         let img
         if (typeof imgArg === 'string' || imgArg instanceof String) {
             img = this.assets.getFile(imgArg)
@@ -63,7 +71,6 @@ export class GameDraw {
 
         dx = Math.ceil(dx)
         dy = Math.ceil(dy)
-        
         this.ctx.drawImage(
             img,
             dx,
@@ -107,19 +114,71 @@ export class GameDraw {
 
         this.ctx.save()
 
-        this.ctx.translate(dx + (img.width / 2), dy + (img.height / 2))
+        this.ctx.translate(dx + (w / 2), dy + (h / 2))
 
         this.ctx.rotate(angle * Math.PI / 180)
 
         this.ctx.drawImage(
             img,
-            -(img.width / 2),
-            -(img.height / 2),
+            -(w / 2),
+            -(h / 2),
             w,
             h
         )
 
         this.ctx.restore()
+
+    }
+
+    drawRotatedScalledImage(imgArg, x: number, y: number, angle: number, [scale1, scale2]: [number, number], forcedWidth: number = null, forcedHeight: number = null, fixe: boolean = false) {
+        this.fpsCounter.drawPsCount++
+
+        let img = this.getImg(imgArg)
+
+        let dx = !fixe ? x - this.camera.x : x
+        let dy = !fixe ? y - this.camera.y : y
+        let w = forcedWidth === null ? img.width : forcedWidth
+        let h = forcedHeight === null ? img.height : forcedHeight
+
+        if(!fixe) {
+            if(dx > (this.width+this.CANVAS_TOLERANCE_EXCEEDED)) {
+                return false
+            }
+    
+            if((dx + w) < -this.CANVAS_TOLERANCE_EXCEEDED) {
+                return false
+            }
+    
+            if(dy > (this.height+this.CANVAS_TOLERANCE_EXCEEDED)) {
+                return false
+            }
+    
+            if((dy + h) < -this.CANVAS_TOLERANCE_EXCEEDED) {
+                return false
+            }
+        }
+
+        dx = Math.ceil(dx)
+        dy = Math.ceil(dy)
+
+        this.ctx.save()
+
+        this.ctx.translate(dx + (w / 2), dy + (h / 2))
+
+        this.ctx.scale(scale1, scale2)
+
+        this.ctx.rotate(angle * Math.PI / 180)
+
+        this.ctx.drawImage(
+            img,
+            -(w / 2),
+            -(h / 2),
+            w,
+            h
+        )
+
+        this.ctx.restore()
+
     }
 
     drawRect(x: number, y: number, w: number, h: number, type: RectType = RectType.fill, style: string = "black", fixe: boolean = false) {

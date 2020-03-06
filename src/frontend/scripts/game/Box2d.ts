@@ -10,6 +10,10 @@ export class Box2d {
     ) {}
 
     draw (game: Game) {
-        // game.drawRect(this.x, this.y, this.width, this.height, RectType.fill, "#f009")
+        if(game.config.debug && game.config.debugBox2d) {
+            game.drawRect(this.x, this.y, this.width, this.height, RectType.fill, "#f009")
+        }
     }
 }
+
+export type Box = {x: number, y: number, width: number, height: number}

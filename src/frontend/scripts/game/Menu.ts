@@ -1,6 +1,5 @@
 import { Game } from "./game";
 import Vue from "vue"
-import { CombinedVueInstance } from "vue/types/vue";
 
 export class Menu {
     constructor(
@@ -29,7 +28,10 @@ export class Menu {
     }
 
     close() {
-        this.vue.hidden = true
+        // this.vue.hidden = true
+        this.vue.hidden = false
+        this.vue.darkBg = false
+        this.vue.current = "in-game"
     }
 
     initVue() {
@@ -45,7 +47,7 @@ export class Menu {
             },
             methods: {            
                 play: function () {
-                    game.startPlay()
+                    game.startPlay(this.username)
                 }
             }
         })
@@ -67,5 +69,11 @@ export class Menu {
         this.vue.hidden = false
         this.vue.darkBg = true
         this.vue.current = "serverReconnection"
+    }
+
+    waitForMoving() {
+        this.vue.hidden = false
+        this.vue.darkBg = false
+        this.vue.current = "waitForMoving"
     }
 }

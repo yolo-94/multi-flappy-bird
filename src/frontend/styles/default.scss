@@ -141,6 +141,21 @@ body {
             }
         }
 
+        // In game
+        .wait-for-moving {
+            font-family: "Arcade Classic", Arial, Helvetica, sans-serif;
+            font-size: 3rem;
+            letter-spacing: 0.5rem;
+            width: 100%;
+            height: 100%;
+            display: flex;
+
+            h1 {
+                text-align: center;
+                margin: 0 auto auto auto;
+            }
+        }
+
     }
 }
 

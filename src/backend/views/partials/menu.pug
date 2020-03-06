@@ -14,3 +14,13 @@ div.server-reconnection(v-else-if="current == 'serverReconnection'")
     h1
         | Reconnexion au serveur...
     img(src="/static/images/mj.gif")
+
+div.wait-for-moving(v-else-if="current == 'waitForMoving'")
+    h1
+        | Appuyez sur 
+        span(v-if="true") espace 
+        span(v-else) sur l'ecran 
+        | pour jouer
+
+div.in-game(v-else-if="current == 'in-game'")
+    div IN GAME

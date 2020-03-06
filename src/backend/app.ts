@@ -4,6 +4,7 @@ import http from "http"
 import socketIo from "socket.io"
 import path from "path"
 import { htmlCss, htmlJs } from "./encore"
+import { GameServer } from "./game-server/GameServer"
 
 let app = express()
 let server = require('http').Server(app)
@@ -40,21 +41,11 @@ app.get("/static/html/menu.html", function (req: express.Request, res: express.R
     res.render("partials/menu.pug")
 })
 
+const gameServer = new GameServer(io)
 
 io.on('connection', function (socket) {
 
-    socket.emit("connected", true)
-
-    socket.on("get:config", () => {
-
-        socket.emit("config", {
-            serverTimeUp,
-            defaultBirdSpeed: 2,
-            gravity: 0.5,
-            velocityMax: 10
-        })
-
-    })
+    gameServer.addClient(socket)
 
 })
 

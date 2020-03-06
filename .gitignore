@@ -5,3 +5,6 @@ static/build
 .vscode
 package.json.*
 package-lock.json.*
+PLAN.txt
+visu.png
+visu2.png

@@ -33,7 +33,9 @@
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
+        "@types/chance": "^1.0.8",
         "@types/socket.io": "^2.1.4",
+        "chance": "^1.1.4",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "minireset.css": "0.0.6",

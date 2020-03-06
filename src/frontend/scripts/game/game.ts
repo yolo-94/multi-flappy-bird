@@ -2,16 +2,12 @@ import { FpsCounter } from "./FpsCounter"
 import { GameDraw } from "./Draw"
 import { Camera } from "./Camera"
 import { Assets } from "./Assets"
-import { Bird } from "./Bird"
-import { Ground } from "./Ground"
-import { Background } from "./Background"
-import { PipesManager } from "./PipesManager"
 import { Input } from "./Input"
-import { Score } from "./Score"
 import { Scene, SceneIntro, SceneBase, SceneEmpty } from "./Scene"
 import { getPixelRatio } from "./utils"
 import { Menu } from "./Menu"
 import { Server } from "./Server"
+import { Player } from "./Player"
 
 export class Game extends GameDraw {
     public canvas: HTMLCanvasElement
@@ -25,23 +21,21 @@ export class Game extends GameDraw {
     public assets: Assets
     public server: Server
     public config: Config
+    public player: Player
 
     public menu: Menu
-    public scene: Scene|SceneIntro
+    public scene: Scene|SceneIntro|SceneEmpty|SceneBase
 
     public camera: Camera
-    public bird: Bird
-    public ground: Ground
-    public background: Background
-    public pipesManager: PipesManager
-    public score: Score
 
     public speed: number = 2
     public defaultSpeed: number = 2
     public gravity: number = 0.5
     public velocityMax = 10
 
-    constructor (public containerSelector: string) {
+    public firstServerTimeUp: number = null
+
+    constructor(public containerSelector: string) {
         super()
         this.canvas = document.createElement("canvas")
         this.fpsCounter = new FpsCounter()
@@ -50,18 +44,16 @@ export class Game extends GameDraw {
         this.server = new Server(this)
         this.config = new Config()
         this.ctx = this.canvas.getContext("2d")
-        this.ctx.imageSmoothingEnabled = false
-
         this.pixelRatio = getPixelRatio(this.ctx)
         this.changeSize(this.width, this.height)
-
         this.resizeEvent()
         document.querySelector(this.containerSelector).appendChild(this.canvas)
+        this.ctx.imageSmoothingEnabled = false
         this.load().then(() => this.start())
     }
 
     /*
-    La fonction qui va être appelé 60 fois par seconde par le navigateur
+    La fonction qui va être appelé 60 fois par seconde
     */
     requestAnimationFrame(timestamp: number) {
         this.update()
@@ -72,44 +64,36 @@ export class Game extends GameDraw {
     }
 
     start() {
+        this.player = new Player(this)
         this.menu = new Menu(this)
-
         this.menu.create(this.containerSelector)
-
         this.scene = new SceneBase(this)
 
-        // this.score = new Score()
-        // this.bird = new Bird()
-        // this.ground = new Ground()
-        // this.background = new Background(this)
-        // this.pipesManager = new PipesManager(this)
-
         this.input = new Input()
-
         this.startMainMenu()
         this.requestAnimationFrame(null)
     }
 
     update() {
-        // this.bird.update(this)
-        // this.camera.update(this)
-        // this.background.update(this)
-        // this.ground.update(this)
-        // this.pipesManager.update(this)
-        // this.fpsCounter.update()
         this.scene?.update(this)
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.width, this.height)
 
-        // this.background.draw(this)
-        // this.pipesManager.draw(this)
-        // this.ground.draw(this)
-        // this.bird.draw(this)
-        // this.score.draw(this)
-        // this.fpsCounter.draw(this)
         this.scene?.draw(this)
+        this.camera?.draw(this)
+        this.fpsCounter.draw(this)
+
+        if(game.config.debug) {
+            this.drawText(this.server?.socket?.io.connected ? "Connecté" : "Déconnecté", this.width - 10, 62, 15, this.server?.socket?.io.connected ? "green" : "red", "right", true)
+        }
+
+        for(let c of this.onDrawEndCallbackList) {
+            c(this)
+        }
+
+        this.onDrawEndCallbackList = []
     }
 
     async load(): Promise<void> {
@@ -153,18 +137,28 @@ export class Game extends GameDraw {
         this.scene = new SceneIntro(this)
     }
 
-    async startPlay() {
+    async startPlay(username: string) {
         this.menu.serverConnection()
         await this.server.connect()
+        this.server.firstConnection()
+        console.log("CONNECTED 22")
+        this.server.sendName(username)
         this.menu.close()
-        // this.scene = new Scene(this)
+        this.scene = new Scene(this)
     }
 
     async reconnect() {
         this.scene = new SceneEmpty(game)
         this.menu.serverReconnection()
         await this.server.waitConnection()
+        await this.server.needServerTimeUp()
+        this.server.firstConnection()
         this.menu.close()
+    }
+
+    public onDrawEndCallbackList: CallableFunction[] = []
+    onDrawEnd(c: CallableFunction) {
+        this.onDrawEndCallbackList.push(c)
     }
 }
 
@@ -173,6 +167,21 @@ export class Config {
     public defaultBirdSpeed: number
     public gravity: number
     public velocityMax: number
+    public defaultVelocityJumpY: number
+    public birdSize: {
+        width: number,
+        height: number
+    }
+    public startPosition: {
+        x: number,
+        y: number
+    }
+    public groundY: number
+    public debug: boolean
+    public debugBox2d: boolean
 }
 
-let game = new Game("#game-zone")
+let game = new Game("#game-zone");
+
+/* Pour le DEBUG */
+(window as any).game = game

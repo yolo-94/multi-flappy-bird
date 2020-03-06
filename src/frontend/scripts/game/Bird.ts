@@ -2,7 +2,9 @@ import { Game } from "./game";
 import { Box2d } from "./Box2d";
 import { RectType } from "./Draw";
 import { randomNumber } from "./utils";
+import { Scene } from "./Scene";
 
+// BIRD BASE
 enum BirdStatus {
     down = "down",
     middle = "middle",
@@ -15,97 +17,59 @@ enum CollideType {
     other
 }
 
-export class Bird {
-    color: string = "red"
-    x: number = 0
-    y: number = 0
-    width: number = 34
-    height: number = 24
-    status: BirdStatus = BirdStatus.down
+enum BirdDirection {
+    left,
+    right
+}
 
-    // velocityX: number = 0
-    velocityY: number = 0
+export abstract class BirdBase {
+    protected _x: number
+    protected _y: number
+    protected _width: number
+    protected _height: number
+    public angle: number
+    public velocityY: number
+    public defaultVelocityY: number = 0
+    public defaultJumpVelocityY: number = -8
+    public status: BirdStatus = BirdStatus.down
+    public speed: number = 0
+    public direction: BirdDirection = BirdDirection.right
+    public move: boolean = false
+    public alive: boolean = true
+    
+    public name: string = ""
+    public color: string = "red"
+    public currentSectionId: number = 0
+    public score: number = 0
 
-    angle: number = -30
+    public debug = true
 
-    jumped: boolean = false
-
-    jumpY: number = 0
-
-    isDead: boolean = false
-
-    collideType: CollideType = CollideType.none
-
-    box2d: Box2d
-
-    collided: boolean
-
-    defaultVelocityY: number = -8
-
-    constructor () {
-        this.box2d = new Box2d(0, 0, 34, 24)
+    constructor(game: Game) {
+        this.x = 0
+        this.y = 0
+        this.angle = 0
+        this.velocityY = 0
+        this.setDefaultSize(game)
         this.startAnimation()
     }
 
-    update(game: Game) {
-        if(this.x == 0 && this.y == 0) {
-            // this.x = game.width
-            // this.y = 300
-            this.reset(game)
-        } else {
-            this.x += game.speed
-        }
+    abstract update(game: Game): void
 
-        this.velocityY += game.gravity
-        this.velocityY = this.velocityY > game.velocityMax ? game.velocityMax : this.velocityY
-        this.y += this.velocityY
-
-        // Jump !
-        if(this.collideType == CollideType.none && !this.isDead) {
-            if(!this.jumped && game.input.space) {
-                this.jumped = true
-                this.jumpY = this.y
-                this.velocityY = this.defaultVelocityY
-            } else if (!game.input.space) {
-                this.jumped = false
-            }
-
-        } else {
-            this.y -= this.velocityY
-        }
-
-        if(this.collideType != CollideType.bottom) {
-            if(0 > this.velocityY) {
-                this.angle = -35
-            } else if(this.angle <= 90) {
-                this.angle += 5
-            }
-        }
-        // --------
-
-        this.collision(game)
-
-        this.box2d.x = this.x
-        this.box2d.y = this.y
-
-        // if(this.collided && this.collideType == CollideType.bottom) {
-        //     game.speed = 0
-        // }
-    }
-
-    draw(game: Game) {
+    draw(game: Game): void {
         game.drawRotatedImage(`${this.color}bird-${this.status}`, this.x, this.y, this.angle, this.width, this.height)
 
-        this.box2d.draw(game)
+        if(this.name != "") {
+            game.drawText(this.name, this.x + this.width / 2, this.y + this.height + 15, 15, "white", "center", false)
+        }
 
-        // if(this.collided) {
-        //     game.drawText("Touché !!!!", 10, 50, 50, "red")
-        // }
-
-        // game.drawText("X " + this.x, 10, 400, 50, "green")
-        // game.drawText("DEAD = " + (this.isDead ? "true" : "false"), 10, 500, 50, "blue")
+        if(this.debug) {
+            game.drawText("move: " + (this.move ? "true" : "false"), this.x + this.width / 2, this.y + this.height + 35, 15, this.move ? "#82ff84" : "red", "center", false)
+            game.drawText("section: " + this.currentSectionId, this.x + this.width / 2, this.y + this.height + 50, 15, "white", "center", false)
+            game.drawText("score: " + this.score, this.x + this.width / 2, this.y + this.height + 65, 15, "white", "center", false)
+        }
     }
 
+    
     startAnimation() {
         setInterval(() => {
             switch(this.status) {
@@ -120,85 +84,297 @@ export class Bird {
         }, 100)
     }
 
-    collision(game: Game) {
-        this.collideType = CollideType.none
-        if(this.y + this.height >= game.ground.y && game.ground.y != -1) {
-            // console.log("ouch !", this.y, game.ground.y)
-            this.collideType = CollideType.bottom
-            this.collided = true
-            this.kill(game)
-            
-            return
+    setDefaultSize(game: Game) {
+        this.width = game.config?.birdSize?.width ?? 34
+        this.height = game.config?.birdSize?.height ?? 24
+    }
+
+    setStartPosition(game: Game) {
+        this.setDefaultSize(game)
+        this.x = game.config.startPosition.x - (this.width / 2)
+        this.y = game.config.startPosition.y - (this.height / 2)
+    }
+
+    get x(): number {
+        return this._x
+    }
+
+    get y(): number {
+        return this._y
+    }
+
+    set x(v: number) {
+        this._x = v
+    }
+
+    set y(v: number) {
+        this._y = v
+    }
+    
+    get width(): number {
+        return this._width
+    }
+
+    get height(): number {
+        return this._height
+    }
+
+    set width(width: number) {
+        if(width != this._width) {
+            this.changeSize(width, this._height)
         }
+    }
 
-        if(this.y < 0) {
-            // console.log("aïe !", this.x, this.y)
-
-            this.collideType = CollideType.other
-            this.collided = true
-            this.kill(game)
-
-            return
+    set height(height: number) {
+        if(height != this._height) {
+            this.changeSize(this._width, height)
         }
+    }
 
-        let collided = false
+    protected changeSize(width: number, height: number): void {
+        this.x += (this.width - width) / 2
+        this.y += (this.height - height) / 2
+        this._width = width
+        this._height = height
+    }
 
-        for(let i = 0; i < game.pipesManager.pipes.length; i++) {
-            let pipe = game.pipesManager.pipes[i]
-            
-            if(
-                (pipe.x >= this.x + this.width) // trop à droite
-            ||  (pipe.x + pipe.width <= this.x) // trop à gauche
-            ||  (pipe.y >= this.y + this.height) // trop en bas
-            ||  (pipe.y + pipe.height <= this.y) // trop en haut
-            ) {
-                // Pas touché...
-            } else {
-                // console.log("Collided", Date.now())
-                collided = true
+    updateGravity(game: Game) {
+        // Gravité
+        if(!this.alive && this.velocityY < 0) {
+            this.velocityY = 0
+        }
+        this.velocityY += game.gravity
+        this.velocityY = this.velocityY > game.velocityMax ? game.velocityMax : this.velocityY
+        this.y += this.velocityY
 
-                if(pipe.y >= this.y + this.height) {
-                    this.collideType = CollideType.bottom
-                } else {
-                    this.collideType = CollideType.other
+        // Angle
+        if(0 > this.velocityY) {
+            this.angle = -35
+        } else if(this.angle <= 90) {
+            this.angle += this.velocityY
+            if(this.angle > 90) {
+                this.angle = 90
+            }
+        }
+    }
+
+    updateXMoving(game: Game) {
+        this.x += this.direction == BirdDirection.right ? this.speed : -this.speed
+    }
+
+}
+
+
+// --------------------------------------------------------------------
+// Bird Player
+// --------------------------------------------------------------------
+export class Bird extends BirdBase {
+    public box2d: Box2d
+
+    public jumped: boolean = false
+
+    public lastSectionId: number = null
+
+    constructor(game: Game) {
+        super(game)
+        this.setStartPosition(game)
+        this.box2d = new Box2d(this.x, this.y, this.width, this.height)
+        this.speed = game.config.defaultBirdSpeed
+        this.defaultJumpVelocityY = game.config.defaultVelocityJumpY
+    }
+
+    update(game: Game): void {
+        this.width = game.config.birdSize.width
+        this.height = game.config.birdSize.height
+        this.name = game.player.name
+
+        if(this.move) {
+
+            // Jump
+            if(this.alive) {
+                if(!this.jumped && game.input.space) {
+                    this.jumped = true
+                    this.velocityY = this.defaultJumpVelocityY
+                } else if(!game.input.space) {
+                    this.jumped = false
                 }
+            }
+
+            this.updateGravity(game)
+
+            if(this.alive) {
+                this.updateXMoving(game)
+            }
+
+
+            if(this.y > 1000) {
+                this.reset(game)
+            }
+        } else {
+            this.alive = true
+            if(game.input.space) {
+                this.move = true
             }
         }
 
-        this.collided = collided
+        this.box2d.x = this.x
+        this.box2d.y = this.y
+        this.box2d.width = this.width
+        this.box2d.height = this.height
 
-        if(this.collided) {
-            this.kill(game)
+        this.collision(game)
+
+        let needSectionUpdate = false
+
+        if(this.currentSectionId !== this.lastSectionId) {
+            this.lastSectionId = this.currentSectionId
+            needSectionUpdate = true
         }
+
+        game.server.sendUpdate([
+            this.x,
+            this.y,
+            this.angle,
+            this.speed,
+            this.direction,
+            this.move ? 1 : 0,
+            this.velocityY,
+            // needSectionUpdate ? this.currentSectionId : null
+            this.currentSectionId
+        ])
+
     }
 
-    kill(game: Game) {
-        if(!this.isDead) {
-            this.isDead = true
-            // game.background.deathAnimation()
-            this.reset(game)
-        }
+    draw(game: Game) {
+        super.draw(game)
+        this.box2d.draw(game)
     }
 
     reset(game: Game) {
-        this.x = game.width
-        this.y = 300
-        this.velocityY = this.defaultVelocityY
-        this.isDead = false
-        this.collided = false
-        this.collideType = CollideType.none
-        game.speed = game.defaultSpeed
-        game.score.reset()
-        game.pipesManager.reset(game)
+        this.move = false
+        this.angle = 0
+        this.velocityY = 0
+        this.speed = game.config.defaultBirdSpeed
+        this.alive = true
+        this.setStartPosition(game)
+    }
+
+    collision(game: Game) {
+        let section = (game.scene as Scene).sectionList.currentSection(this)
+        let sectionBefore = section ? (game.scene as Scene).sectionList.get(section.id - 1) : null
+
+        let alive = this.alive
+
+        if(alive) {
+            if(this.y < 0) {
+                this.alive = false
+                return
+            }
+            if(this.y + this.height >= (game.scene as Scene).ground.y) {
+                this.alive = false
+                return
+            }
+            if(sectionBefore) {
+                for(let object of sectionBefore.objects) {
+                    if(object.touch(this)) {
+                        if(alive) {
+                            this.alive = false
+                            return
+                        }
+                    }
+                }
+            }
+            if(section) {
+                for(let object of section.objects) {
+                    if(object.touch(this)) {
+                        if(alive) {
+                            this.alive = false
+                            return
+                        }
+                    }
+                }
+            }
+        } else {
+
+        }
+    }
+
+}
+
+// --------------------------------------------------------------------
+// Bird controlled by other player
+// --------------------------------------------------------------------
+
+export class BirdClientList {
+    public birds: BirdClient[] = []
+
+    createBird(game: Game, playerId: string) {
+        let bird = new BirdClient(game, playerId)
+        this.birds.push(bird)
+        return bird
+    }
+
+    exist(playerId) {
+        for(let i = 0; i < this.birds.length; i++) {
+            if(this.birds[i].playerId == playerId) {
+                return true
+            }
+        }
+        return false
+    }
+
+    getById(playerId: string): BirdClient {
+        for(let bird of this.birds) {
+            if(bird.playerId == playerId) {
+                return bird
+            }
+        }
+        return null
+    }
+
+    removeById(id: string) {
+        this.birds = this.birds.filter((bird) => {
+            return !(id === bird.playerId)
+        })
     }
 }
 
-export class BirdIntro extends Bird {
+export class BirdClient extends BirdBase {
+    public playerId: string
+    
+    constructor(game: Game, playerId: string) {
+        super(game)
+        this.color = "blue"
+        this.playerId = playerId
+    }
+
+    update(game: Game): void {
+        this.width = game.config.birdSize.width
+        this.height = game.config.birdSize.height
+
+        if(this.move) {
+            this.updateGravity(game)
+            this.updateXMoving(game)
+        }
+    }
+
+    changePosition(x: number, y: number) {
+        this.x = x
+        this.y = y
+    }
+}
+
+// --------------------------------------------------------------------
+// Bird with AI
+// --------------------------------------------------------------------
+export class BirdIntro extends BirdBase {
 
     mustJump: boolean = false
 
+    debug: boolean = false
+
     constructor(game: Game) {
-        super()
+        super(game)
 
         if(randomNumber(0, 1) == 0) {
             this.color = "red"
@@ -223,7 +399,7 @@ export class BirdIntro extends Bird {
         if((this.x + this.width > game.width + 100) || (this.y - 50 > game.height)) {
             this.goBack(game)
         }
-
+ 
         // Gravité
         this.velocityY += game.gravity
         this.velocityY = this.velocityY > game.velocityMax ? game.velocityMax : this.velocityY
@@ -235,7 +411,7 @@ export class BirdIntro extends Bird {
             this.mustJump = false
         }
         if(this.mustJump) {
-            this.velocityY = this.defaultVelocityY
+            this.velocityY = this.defaultJumpVelocityY
             this.mustJump = false
         }
 

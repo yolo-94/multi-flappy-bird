@@ -62,7 +62,7 @@ export abstract class BirdBase {
             game.drawText(this.name, this.x + this.width / 2, this.y + this.height + 15, 15, "white", "center", false)
         }
 
-        if(this.debug) {
+        if(this.debug && game.config.debug) {
             game.drawText("move: " + (this.move ? "true" : "false"), this.x + this.width / 2, this.y + this.height + 35, 15, this.move ? "#82ff84" : "red", "center", false)
             game.drawText("section: " + this.currentSectionId, this.x + this.width / 2, this.y + this.height + 50, 15, "white", "center", false)
             game.drawText("score: " + this.score, this.x + this.width / 2, this.y + this.height + 65, 15, "white", "center", false)

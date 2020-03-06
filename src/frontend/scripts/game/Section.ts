@@ -39,12 +39,13 @@ export class Section {
     }
 
     draw(game: Game) {
-        game.drawRect(this.x, 0, this.width, this.height, RectType.stroke, "rgba(0, 0, 0, 1)")
-        if(this.scoreZone !== null) {
+        if(game.config.debug) {
+            game.drawRect(this.x, 0, this.width, this.height, RectType.stroke, "rgba(0, 0, 0, 1)")
+        }
+        if(this.scoreZone !== null && game.config.debug) {
             game.drawRect(this.scoreZone.x, this.scoreZone.y, this.scoreZone.width, this.scoreZone.height, RectType.fill, "rgba(255, 0, 0, 0.5)")
         }
         for(let obj of this.objects) {
-            // game.drawRect(obj.x, obj.y, obj.width, obj.height, RectType.fill, "yellow")
             obj.draw(game)
         }
     }

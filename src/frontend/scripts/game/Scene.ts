@@ -100,7 +100,7 @@ export class Scene extends SceneBase {
         }
         this.bird.draw(game)
 
-        let i = 100
+        let i = game.config.debug ? 100 :  20
         game.drawText(`${Object.keys(this.playerList).length} joueur(s) en ligne`, game.width-10, i, 15, "white", "right", true)
         i += 20
         for(let id in this.playerList) {

@@ -46,7 +46,7 @@ export class GameServer {
                 width: 34,
                 height: 24
             },
-            debug: true
+            debug: process.env.NODE_ENV != 'production'
         }
 
         this.clients = []

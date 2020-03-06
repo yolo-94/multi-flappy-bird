@@ -18,7 +18,7 @@ app.use("/static", express.static('static'))
 
 /* Pug */
 app.set('view engine', 'pug')
-app.set('views', path.join(__dirname, '../../src/backend/Views'))
+app.set('views', path.join(__dirname, '../../src/backend/views'))
 
 app.locals = {
     ...app.locals,

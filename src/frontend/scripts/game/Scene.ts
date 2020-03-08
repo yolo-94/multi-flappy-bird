@@ -149,7 +149,6 @@ export class Scene extends SceneBase {
                     if(typeof data.scoreAmount == "number" && data.scoreAmount > 0) {
                         section.scoreAmount = data.scoreAmount
                     }
-                    console.log("create section", section.id)
                 }
             }
 

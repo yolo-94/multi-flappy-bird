@@ -64,7 +64,6 @@ export class Assets {
                 return
             }
             GameAudio.load(src).then(audio => {
-                console.log(audio)
                 this.files[name] = audio
                 resolve(audio)
             }).catch(reject)

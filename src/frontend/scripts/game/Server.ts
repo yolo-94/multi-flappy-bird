@@ -104,7 +104,6 @@ export class Server {
             debug: config.debug ?? this.game.config.debug ?? false,
             debugBox2d: false
         }
-        console.log(config)
     }
 
     async firstConnection() {

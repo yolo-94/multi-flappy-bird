@@ -114,6 +114,10 @@ export class Game extends GameDraw {
         for(let i = 0; i <= 9; i++) {
             await this.assets.loadImage("number-" + i, "/static/assets/" + i + ".png")    
         }
+        await this.assets.loadAudio("audio:score", "/static/assets/audio/score.ogg")
+        await this.assets.loadAudio("audio:jump", "/static/assets/audio/jump.ogg")
+        await this.assets.loadAudio("audio:hit", "/static/assets/audio/hit.ogg")
+        await this.assets.loadAudio("audio:lose", "/static/assets/audio/lose.ogg")
     }
 
     changeSize(width: number, height: number) {
@@ -141,7 +145,6 @@ export class Game extends GameDraw {
         this.menu.serverConnection()
         await this.server.connect()
         this.server.firstConnection()
-        console.log("CONNECTED 22")
         this.server.sendName(username)
         this.menu.close()
         this.scene = new Scene(this)

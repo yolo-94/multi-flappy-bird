@@ -70,7 +70,7 @@ export class Scene extends SceneBase {
         } else {
             game.menu.waitForMoving()
             this.sectionList.reset(game)
-            this.bird.score = 0
+            this.bird.resetScore()
         }
 
 
@@ -81,7 +81,7 @@ export class Scene extends SceneBase {
             this.bird.currentSectionId = section.id
             if(!section.scoreZoneReached && section.touchScoreZone(this.bird)) {
                 section.scoreZoneReached = true
-                this.bird.score += section.scoreAmount
+                this.bird.addScore(game, section.scoreAmount)
             }
         }
 

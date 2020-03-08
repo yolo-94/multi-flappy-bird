@@ -1,3 +1,5 @@
+import { GameAudio } from "./Audio"
+
 export interface FileCallback {
     (file: any): any
 }
@@ -19,10 +21,11 @@ export class Assets {
         this.clearFile()
     }
 
-    loadFile(name, src: string): Promise<any> {
+    loadFile(name: string, src: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if(this.files[name]) {
                 resolve(this.files[name])
+                return
             }
             fetch(src)
             .then(Response => {
@@ -36,10 +39,11 @@ export class Assets {
         })
     }
 
-    loadImage(name, src: string): Promise<any> {
+    loadImage(name: string, src: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if(this.files[name]) {
                 resolve(this.files[name])
+                return
             }
             let img = new Image()
             img.src = src
@@ -50,6 +54,20 @@ export class Assets {
                 reject("Erreur chargement de l'image " + name + " " + src)
             }
             this.files[name] = img
+        })
+    }
+
+    loadAudio(name: string, src: string): Promise<GameAudio> {
+        return new Promise((resolve, reject) => {
+            if(this.files[name]) {
+                resolve(this.files[name])
+                return
+            }
+            GameAudio.load(src).then(audio => {
+                console.log(audio)
+                this.files[name] = audio
+                resolve(audio)
+            }).catch(reject)
         })
     }
 

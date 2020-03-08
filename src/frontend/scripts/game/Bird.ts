@@ -162,6 +162,20 @@ export abstract class BirdBase {
         this.x += this.direction == BirdDirection.right ? this.speed : -this.speed
     }
 
+    hit(game: Game, onPipe: boolean = false) {
+        this.alive = false
+        game.assets.getFile("audio:hit")?.play(0)
+        if(onPipe) {
+            setTimeout(() => {
+                game.assets.getFile("audio:lose")?.play(0)
+            }, 100)
+        }
+    }
+
+    jump(game: Game) {
+        this.velocityY = this.defaultJumpVelocityY
+        game.assets.getFile("audio:jump")?.play(0)
+    }
 }
 
 
@@ -194,7 +208,7 @@ export class Bird extends BirdBase {
             if(this.alive) {
                 if(!this.jumped && game.input.space) {
                     this.jumped = true
-                    this.velocityY = this.defaultJumpVelocityY
+                    this.jump(game)
                 } else if(!game.input.space) {
                     this.jumped = false
                 }
@@ -267,18 +281,18 @@ export class Bird extends BirdBase {
 
         if(alive) {
             if(this.y < 0) {
-                this.alive = false
+                this.hit(game)
                 return
             }
             if(this.y + this.height >= (game.scene as Scene).ground.y) {
-                this.alive = false
+                this.hit(game)
                 return
             }
             if(sectionBefore) {
                 for(let object of sectionBefore.objects) {
                     if(object.touch(this)) {
                         if(alive) {
-                            this.alive = false
+                            this.hit(game, true)
                             return
                         }
                     }
@@ -288,7 +302,7 @@ export class Bird extends BirdBase {
                 for(let object of section.objects) {
                     if(object.touch(this)) {
                         if(alive) {
-                            this.alive = false
+                            this.hit(game, true)
                             return
                         }
                     }
@@ -297,6 +311,15 @@ export class Bird extends BirdBase {
         } else {
 
         }
+    }
+
+    addScore(game: Game, amount: number): void {
+        this.score += amount
+        game.assets.getFile("audio:score")?.play(0)
+    }
+
+    resetScore() {
+        this.score = 0
     }
 
 }

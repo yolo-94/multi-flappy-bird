@@ -10,6 +10,7 @@ export class Player {
 
     public id: string
     public name: string
+    public score: number
 
     public bird: {
         x: number,
@@ -39,6 +40,7 @@ export class Player {
     ) {
         this.id = client.socket.id
         this.name = "Guest"
+        this.score = 0
         this.bird.x = server.config.startPosition.x - server.config.birdSize.width / 2
         this.bird.y = server.config.startPosition.y - server.config.birdSize.height / 2
     }
@@ -57,7 +59,8 @@ export class Player {
             typeof data[3] == "number" &&
             typeof data[4] == "number" &&
             typeof data[5] == "number" &&
-            typeof data[6] == "number"
+            typeof data[6] == "number" &&
+            typeof data[8] == "number"
         ) {
             this.bird.x = data[0]
             this.bird.y = data[1]
@@ -66,6 +69,7 @@ export class Player {
             this.bird.direction = data[4]
             this.bird.move = data[5] == 1
             this.bird.velocityY = data[6]
+            this.score = data[8]
         }
 
         if(data[7] !== null && typeof data[7] == "number" && data[7] >= 0) {

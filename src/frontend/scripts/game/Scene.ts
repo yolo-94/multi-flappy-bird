@@ -7,6 +7,7 @@ import { SectionList } from "./Section";
 import { RectType } from "./Draw";
 import { Pipe } from "./Pipe";
 import { Ground } from "./Ground";
+import { Score } from "./Score";
 
 export enum ServerDataType {
     BirdUpdate,
@@ -30,10 +31,12 @@ export class Scene extends SceneBase {
     public birdClientList: BirdClientList
     public sectionList: SectionList
     public camera: Camera
+    public score: Score
 
     public playerList: {
         [id: string]: {
-            name: string
+            name: string,
+            score: number
         }
     }
 
@@ -47,6 +50,7 @@ export class Scene extends SceneBase {
         this.sectionList = new SectionList()
         this.bird = new Bird(game)
         this.birdClientList = new BirdClientList()
+        this.score = new Score()
 
         game.server.getName().then((name) => this.bird.name = name)
     }
@@ -86,6 +90,8 @@ export class Scene extends SceneBase {
         }
 
         this.followEntity(game, this.bird)
+
+        this.score.points = this.bird.score
     }
 
     draw(game: Game) {
@@ -100,11 +106,13 @@ export class Scene extends SceneBase {
         }
         this.bird.draw(game)
 
+        this.score.draw(game)
+
         let i = game.config.debug ? 100 :  20
         game.drawText(`${Object.keys(this.playerList).length} joueur(s) en ligne`, game.width-10, i, 15, "white", "right", true)
         i += 20
         for(let id in this.playerList) {
-            game.drawText(`${this.playerList[id].name} (0)`, game.width-10, i, 15, "white", "right", true)
+            game.drawText(`${this.playerList[id].name} (${this.playerList[id].score})`, game.width-10, i, 15, "white", "right", true)
             i += 20
         }
     }
@@ -132,6 +140,9 @@ export class Scene extends SceneBase {
                 bird.direction = data.direction
                 bird.move = data.move == 1
                 bird.velocityY = data.velocityY
+                if(this.playerList[data.id]) {
+                    this.playerList[data.id].score = data.score
+                }
             } else if(type == ServerDataType.SectionUpdate) {
                 if(!this.sectionList.exist(data.id)) {
                     let section = this.sectionList.create({
@@ -156,14 +167,15 @@ export class Scene extends SceneBase {
         }
     }
 
-    onPlayerListUpdate(data: {id: string, name: string}[]) {
+    onPlayerListUpdate(data: {id: string, name: string, score: number}[]) {
         this.playerList = {}
         let noExists = this.birdClientList.birds.map(bird => {
             return bird.playerId
         })
         for(let dat of data) {
             this.playerList[dat.id] = {
-                name: dat.name
+                name: dat.name,
+                score: dat.score
             }
 
             noExists = noExists.filter((id) => {

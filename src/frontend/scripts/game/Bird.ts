@@ -206,10 +206,10 @@ export class Bird extends BirdBase {
 
             // Jump
             if(this.alive) {
-                if(!this.jumped && game.input.space) {
+                if(!this.jumped && game.input.jump()) {
                     this.jumped = true
                     this.jump(game)
-                } else if(!game.input.space) {
+                } else if(!game.input.jump()) {
                     this.jumped = false
                 }
             }
@@ -220,13 +220,12 @@ export class Bird extends BirdBase {
                 this.updateXMoving(game)
             }
 
-
             if(this.y > 1000) {
                 this.reset(game)
             }
         } else {
             this.alive = true
-            if(game.input.space) {
+            if(game.input.jump()) {
                 this.move = true
             }
         }
@@ -254,7 +253,8 @@ export class Bird extends BirdBase {
             this.move ? 1 : 0,
             this.velocityY,
             // needSectionUpdate ? this.currentSectionId : null
-            this.currentSectionId
+            this.currentSectionId,
+            this.score
         ])
 
     }

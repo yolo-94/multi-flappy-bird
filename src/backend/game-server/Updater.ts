@@ -33,7 +33,8 @@ export class Updater {
                         speed: player.bird.speed,
                         direction: player.bird.direction,
                         move: player.bird.move,
-                        velocityY: player.bird.velocityY
+                        velocityY: player.bird.velocityY,
+                        score: player.score
                     })
                 }
                 // if(player.needSectionUpdate) {
@@ -63,7 +64,8 @@ export class Updater {
         for(let player of this.server.players) {
             data.push({
                 id: player.id,
-                name: player.name
+                name: player.name,
+                score: player.score
             })
         }
         this.server.socket.emit("updatePlayerList", data)
@@ -94,7 +96,8 @@ class ServerDataObj {
         speed: number,
         direction: BirdDirection,
         move: boolean,
-        velocityY: number
+        velocityY: number,
+        score: number
     }) {
         this.data.push({
             type: ServerDataType.BirdUpdate,

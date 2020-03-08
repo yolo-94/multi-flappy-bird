@@ -18,7 +18,7 @@ div.server-reconnection(v-else-if="current == 'serverReconnection'")
 div.wait-for-moving(v-else-if="current == 'waitForMoving'")
     h1
         | Appuyez sur 
-        span(v-if="true") espace 
+        span(v-if="useTouch") espace 
         span(v-else) sur l'ecran 
         | pour jouer
 

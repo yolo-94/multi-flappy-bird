@@ -49,6 +49,7 @@ export class Game extends GameDraw {
         this.resizeEvent()
         document.querySelector(this.containerSelector).appendChild(this.canvas)
         this.ctx.imageSmoothingEnabled = false
+        this.eventsCleaner()
         this.load().then(() => this.start())
     }
 
@@ -162,6 +163,14 @@ export class Game extends GameDraw {
     public onDrawEndCallbackList: CallableFunction[] = []
     onDrawEnd(c: CallableFunction) {
         this.onDrawEndCallbackList.push(c)
+    }
+
+    eventsCleaner() {
+        document.body.setAttribute("style", "-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;")
+        document.body.setAttribute("unselectable", "on")
+        document.body.onselectstart = function () {
+            return false
+        }
     }
 }
 

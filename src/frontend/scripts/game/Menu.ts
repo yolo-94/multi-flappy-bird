@@ -42,6 +42,7 @@ export class Menu {
                 hidden: false,
                 darkBg: false,
                 current: "main",
+                useTouch: game.input?.useTouch,
 
                 username: ""
             },
